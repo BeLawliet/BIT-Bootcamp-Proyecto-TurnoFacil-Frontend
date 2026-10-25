@@ -10,7 +10,13 @@
             Ver servicios
             <svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </a>
-          <a class="btn btn-outline-secondary btn-lg" routerLink="/login">Iniciar sesión</a>
+          @if (authService.comprobacionInicialTerminada()) {
+            @if (authService.estaAutenticado()) {
+              <a class="btn btn-outline-secondary btn-lg" routerLink="/mis-citas">Mis citas</a>
+            } @else {
+              <a class="btn btn-outline-secondary btn-lg" routerLink="/login">Iniciar sesión</a>
+            }
+          }
         </div>
         <div class="hero-points" aria-label="Ventajas de TurnoFácil">
           <span><span aria-hidden="true">✓</span> Reserva sencilla</span>

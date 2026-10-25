@@ -226,7 +226,6 @@ export class Reservar {
       .pipe(
         tap((respuesta) => {
           this.reservaCreada.set(respuesta.data);
-          this.formulario.disable();
         }),
         takeUntilDestroyed(this.destroyRef),
       )
