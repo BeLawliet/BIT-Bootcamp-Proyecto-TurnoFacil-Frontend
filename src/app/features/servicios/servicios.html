@@ -2,20 +2,61 @@
   <div class="container">
     <div class="page-heading">
       <span class="page-eyebrow">TURNOFÁCIL · BARBERÍA</span>
-      <h1 id="page-title">Servicios para tu próximo turno</h1>
-      <p>Estamos preparando el catálogo para que puedas consultar las opciones y elegir la que mejor se adapte a ti.</p>
+      <h1 id="page-title">Elige el servicio para tu próximo turno</h1>
+      <p>Conoce las opciones disponibles y consulta su información antes de reservar.</p>
     </div>
 
-    <article class="coming-card">
-      <div class="coming-icon" aria-hidden="true">
-        <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="10" width="32" height="30" rx="6" stroke="currentColor" stroke-width="2.2"/><path d="M15 7v7m18-7v7M8 19h32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16 25h5m6 0h5m-16 7h5m6 0h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-      </div>
-      <div>
-        <span class="status-label">PRÓXIMAMENTE</span>
-        <h2>El catálogo estará aquí</h2>
-        <p>En la siguiente etapa conectaremos esta vista con los servicios del negocio. Los detalles y horarios se mostrarán según la información disponible en la agenda.</p>
-        <a class="btn btn-primary" routerLink="/">Volver al inicio</a>
-      </div>
-    </article>
+    @if (estado$ | async; as estado) {
+      @switch (estado.tipo) {
+        @case ('cargando') {
+          <div class="state-card" role="status" aria-live="polite">
+            <span class="spinner-border text-primary" aria-hidden="true"></span>
+            <p>Consultando servicios...</p>
+          </div>
+        }
+        @case ('vacio') {
+          <div class="state-card" role="status">
+            <span class="state-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="10" width="32" height="30" rx="6" stroke="currentColor" stroke-width="2.2"/><path d="M15 7v7m18-7v7M8 19h32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M17 28h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </span>
+            <h2>No hay servicios disponibles por ahora</h2>
+            <p>Vuelve a consultar más tarde para ver las opciones de la barbería.</p>
+          </div>
+        }
+        @case ('error') {
+          <div class="state-card" role="alert">
+            <span class="state-icon state-icon-error" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2.2"/><path d="M24 15v11m0 7h.02" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            </span>
+            <h2>No pudimos cargar los servicios</h2>
+            <p>Revisa tu conexión e inténtalo de nuevo.</p>
+            <button class="btn btn-outline-primary" type="button" (click)="reintentar()">Reintentar</button>
+          </div>
+        }
+        @case ('listo') {
+          <div class="row g-4 service-grid">
+            @for (servicio of estado.servicios; track servicio.id) {
+              <div class="col-md-6 col-lg-4">
+                <article class="service-card h-100">
+                  <div class="service-card-heading">
+                    <span class="service-icon" aria-hidden="true">
+                      <svg viewBox="0 0 32 32" fill="none"><circle cx="8" cy="9" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="23" r="3" stroke="currentColor" stroke-width="1.8"/><path d="m10.5 10.5 13 11m-13 0 13-11m0 0 4-4m-4 4 5 1m-5 10 4 4m-4-4 5-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="service-label">Servicio</span>
+                  </div>
+                  <h2>{{ servicio.nombre }}</h2>
+                  <p class="service-description">{{ servicio.descripcion }}</p>
+                  <div class="service-card-footer">
+                    <p class="service-price-label">Precio</p>
+                    <p class="service-price">{{ formatearPrecio(servicio.precio) }}</p>
+                    <a class="btn btn-primary w-100" routerLink="/login">Reservar</a>
+                  </div>
+                </article>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
   </div>
 </section>
