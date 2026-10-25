@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,20 @@ export const routes: Routes = [
     path: 'registro',
     title: 'Registro | TurnoFácil',
     loadComponent: () => import('./features/auth/registro/registro').then((module) => module.Registro),
+  },
+  {
+    path: 'reservar',
+    title: 'Reservar cita | TurnoFácil',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/reservas/reservar/reservar').then((module) => module.Reservar),
+  },
+  {
+    path: 'mis-citas',
+    title: 'Mis citas | TurnoFácil',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/reservas/mis-citas/mis-citas').then((module) => module.MisCitas),
   },
   {
     path: '**',

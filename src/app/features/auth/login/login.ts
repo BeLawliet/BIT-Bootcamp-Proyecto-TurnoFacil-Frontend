@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, switchMap, tap, timer } from 'rxjs';
 import { AuthService } from '../auth.service';
 
@@ -24,6 +24,7 @@ function tieneMensaje(valor: unknown): valor is { message: string } {
 export class Login {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -57,6 +58,7 @@ export class Login {
     }
 
     const datos = this.formulario.getRawValue();
+    const rutaRetorno = this.obtenerRutaRetorno();
     this.mensajeError.set(null);
     this.enviando.set(true);
 
@@ -72,7 +74,7 @@ export class Login {
         finalize(() => this.enviando.set(false)),
       )
       .subscribe({
-        next: () => void this.router.navigateByUrl('/'),
+        next: () => void this.router.navigateByUrl(rutaRetorno),
         error: (error: unknown) => this.mensajeError.set(this.obtenerMensajeError(error)),
       });
   }
@@ -95,5 +97,15 @@ export class Login {
     }
 
     return 'No pudimos iniciar sesión. Inténtalo nuevamente.';
+  }
+
+  private obtenerRutaRetorno(): string {
+    const ruta = this.route.snapshot.queryParamMap.get('returnUrl');
+
+    if (!ruta || !ruta.startsWith('/') || ruta.startsWith('//') || ruta.includes('\\')) {
+      return '/';
+    }
+
+    return ruta;
   }
 }

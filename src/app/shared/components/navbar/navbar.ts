@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../features/auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -8,6 +9,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
+  protected readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   protected readonly menuOpen = signal(false);
 
   protected closeMenu(): void {
@@ -16,5 +19,11 @@ export class Navbar {
 
   protected toggleMenu(): void {
     this.menuOpen.update((isOpen) => !isOpen);
+  }
+
+  protected cerrarSesion(): void {
+    this.authService.cerrarSesion();
+    this.closeMenu();
+    void this.router.navigate(['/']);
   }
 }
