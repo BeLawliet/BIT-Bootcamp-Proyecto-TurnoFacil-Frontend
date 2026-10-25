@@ -1,15 +1,193 @@
 <section class="auth-page" aria-labelledby="page-title">
   <div class="container auth-container">
-    <div class="auth-card">
-      <span class="auth-icon" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none"><path d="M16 7v18M7 16h18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.8"/></svg>
-      </span>
-      <span class="auth-kicker">EMPIEZA AQUÍ</span>
-      <h1 id="page-title">Crea tu cuenta</h1>
-      <p>El registro estará disponible cuando conectemos TurnoFácil con el sistema de cuentas.</p>
-      <div class="notice-panel"><span aria-hidden="true">i</span> En esta etapa no se recopilan ni guardan datos personales.</div>
-      <a class="btn btn-primary w-100" routerLink="/login">Ir a iniciar sesión</a>
-      <a class="back-link" routerLink="/">Volver al inicio</a>
-    </div>
+    @if (registroExitoso()) {
+      <div class="auth-card register-card success-card" role="status" aria-live="polite">
+        <span class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="m8 16 5.3 5.3L24 10.7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.8"/></svg>
+        </span>
+        <span class="auth-kicker">REGISTRO COMPLETADO</span>
+        <h1 id="page-title">Tu cuenta fue creada</h1>
+        <p>Ya puedes iniciar sesión con tus datos. No se inició una sesión automáticamente.</p>
+        <a class="btn btn-primary w-100" routerLink="/login">Ir a iniciar sesión</a>
+        <a class="back-link" routerLink="/">Volver al inicio</a>
+      </div>
+    } @else {
+      <div class="auth-card register-card">
+        <div class="register-intro">
+          <span class="auth-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M16 7v18M7 16h18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+          <span class="auth-kicker">EMPIEZA AQUÍ</span>
+          <h1 id="page-title">Crea tu cuenta</h1>
+          <p>Regístrate para organizar tus próximas reservas.</p>
+        </div>
+
+        @if (mensajeError(); as mensaje) {
+          <div class="alert alert-danger registration-error" role="alert">{{ mensaje }}</div>
+        }
+
+        <form [formGroup]="formulario" (ngSubmit)="enviarRegistro()" (input)="limpiarMensajeError()" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="nombre">Nombre completo</label>
+            <input
+              class="form-control"
+              [class.is-invalid]="campoInvalido('nombre')"
+              [attr.aria-invalid]="campoInvalido('nombre') ? 'true' : null"
+              [attr.aria-describedby]="campoInvalido('nombre') ? 'nombre-error' : null"
+              id="nombre"
+              type="text"
+              formControlName="nombre"
+              placeholder="Escribe tu nombre completo"
+              autocomplete="name"
+              minlength="3"
+              maxlength="100"
+            />
+            @if (campoInvalido('nombre')) {
+              <div class="invalid-feedback d-block" id="nombre-error" role="alert">
+                @if (formulario.controls.nombre.hasError('required')) {
+                  Escribe tu nombre completo.
+                } @else if (formulario.controls.nombre.hasError('minlength')) {
+                  El nombre debe tener al menos 3 caracteres.
+                } @else if (formulario.controls.nombre.hasError('maxlength')) {
+                  El nombre no puede superar los 100 caracteres.
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="correo">Correo electrónico</label>
+            <input
+              class="form-control"
+              [class.is-invalid]="campoInvalido('correo')"
+              [attr.aria-invalid]="campoInvalido('correo') ? 'true' : null"
+              [attr.aria-describedby]="campoInvalido('correo') ? 'correo-error' : null"
+              id="correo"
+              type="email"
+              formControlName="correo"
+              placeholder="nombre@ejemplo.com"
+              autocomplete="email"
+              maxlength="254"
+            />
+            @if (campoInvalido('correo')) {
+              <div class="invalid-feedback d-block" id="correo-error" role="alert">
+                @if (formulario.controls.correo.hasError('required')) {
+                  Escribe tu correo electrónico.
+                } @else {
+                  Ingresa un correo electrónico válido.
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="password">Contraseña</label>
+            <div class="input-group">
+              <input
+                class="form-control"
+                [class.is-invalid]="campoInvalido('password')"
+                [attr.aria-invalid]="campoInvalido('password') ? 'true' : null"
+                [attr.aria-describedby]="campoInvalido('password') ? 'password-ayuda password-error' : 'password-ayuda'"
+                id="password"
+                [type]="mostrarPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Crea una contraseña segura"
+                autocomplete="new-password"
+                minlength="8"
+              />
+              <button
+                class="btn btn-outline-secondary password-toggle"
+                type="button"
+                [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                [attr.aria-pressed]="mostrarPassword()"
+                (click)="mostrarPassword.update((mostrar) => !mostrar)"
+              >
+                {{ mostrarPassword() ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            <div class="form-text" id="password-ayuda">Mínimo 8 caracteres, con mayúscula, minúscula, número y carácter especial.</div>
+            @if (campoInvalido('password')) {
+              <div class="invalid-feedback d-block" id="password-error" role="alert">
+                @if (formulario.controls.password.hasError('required')) {
+                  Escribe una contraseña.
+                } @else if (formulario.controls.password.hasError('minlength')) {
+                  La contraseña debe tener al menos 8 caracteres.
+                } @else {
+                  Incluye una mayúscula, una minúscula, un número y un carácter especial.
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="confirmarPassword">Confirmar contraseña</label>
+            <div class="input-group">
+              <input
+                class="form-control"
+                [class.is-invalid]="campoInvalido('confirmarPassword')"
+                [attr.aria-invalid]="campoInvalido('confirmarPassword') ? 'true' : null"
+                [attr.aria-describedby]="campoInvalido('confirmarPassword') ? 'confirmar-password-error' : null"
+                id="confirmarPassword"
+                [type]="mostrarConfirmacion() ? 'text' : 'password'"
+                formControlName="confirmarPassword"
+                placeholder="Escribe nuevamente tu contraseña"
+                autocomplete="new-password"
+              />
+              <button
+                class="btn btn-outline-secondary password-toggle"
+                type="button"
+                [attr.aria-label]="mostrarConfirmacion() ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'"
+                [attr.aria-pressed]="mostrarConfirmacion()"
+                (click)="mostrarConfirmacion.update((mostrar) => !mostrar)"
+              >
+                {{ mostrarConfirmacion() ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            @if (campoInvalido('confirmarPassword')) {
+              <div class="invalid-feedback d-block" id="confirmar-password-error" role="alert">
+                @if (formulario.controls.confirmarPassword.hasError('required')) {
+                  Confirma tu contraseña.
+                } @else {
+                  Las contraseñas no coinciden.
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="telefono">Teléfono celular <span class="optional-label">(opcional)</span></label>
+            <input
+              class="form-control"
+              [class.is-invalid]="campoInvalido('telefono')"
+              [attr.aria-invalid]="campoInvalido('telefono') ? 'true' : null"
+              [attr.aria-describedby]="campoInvalido('telefono') ? 'telefono-error' : 'telefono-ayuda'"
+              id="telefono"
+              type="tel"
+              inputmode="numeric"
+              formControlName="telefono"
+              placeholder="3001234567"
+              autocomplete="tel"
+              maxlength="10"
+            />
+            <div class="form-text" id="telefono-ayuda">10 dígitos, comenzando por 3.</div>
+            @if (campoInvalido('telefono')) {
+              <div class="invalid-feedback d-block" id="telefono-error" role="alert">Ingresa un celular colombiano de 10 dígitos que comience por 3.</div>
+            }
+          </div>
+
+          <button class="btn btn-primary w-100 submit-button" type="submit" [disabled]="enviando()">
+            @if (enviando()) {
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+              Creando cuenta...
+            } @else {
+              Crear cuenta
+            }
+          </button>
+        </form>
+
+        <p class="login-prompt">¿Ya tienes cuenta? <a routerLink="/login">Iniciar sesión</a></p>
+        <a class="back-link" routerLink="/">Volver al inicio</a>
+      </div>
+    }
   </div>
 </section>

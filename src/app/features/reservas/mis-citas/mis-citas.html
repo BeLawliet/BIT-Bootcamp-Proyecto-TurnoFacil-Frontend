@@ -1,0 +1,192 @@
+<section class="appointments-page" aria-labelledby="page-title">
+  <div class="container">
+    <header class="page-heading">
+      <div>
+        <span class="page-eyebrow">TU AGENDA · BARBERÍA</span>
+        <h1 id="page-title">Mis citas</h1>
+        <p>Consulta las reservas asociadas a tu cuenta y revisa sus detalles.</p>
+      </div>
+      <a class="btn btn-primary new-appointment-button" routerLink="/reservar">
+        <span aria-hidden="true">+</span>
+        Nueva reserva
+      </a>
+    </header>
+
+    @if (avisoCancelacion(); as aviso) {
+      <div
+        class="cancellation-notice"
+        [class.notice-success]="aviso.tipo === 'exito'"
+        [class.notice-error]="aviso.tipo === 'error'"
+        [class.notice-info]="aviso.tipo === 'info'"
+        [attr.role]="aviso.tipo === 'error' ? 'alert' : 'status'"
+        aria-live="polite"
+      >
+        <p>{{ aviso.mensaje }}</p>
+        @if (requiereActualizar()) {
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="estado() === 'cargando' || cancelandoId() !== null"
+            (click)="actualizarAntesDeReintentar()"
+          >
+            @if (estado() === 'cargando') {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+              Actualizando...
+            } @else {
+              Actualizar citas
+            }
+          </button>
+        }
+      </div>
+    }
+
+    @if (estado() === 'cargando') {
+      <div class="state-card" role="status" aria-live="polite">
+        <span class="spinner-border text-primary" aria-hidden="true"></span>
+        <p>Consultando tus citas...</p>
+      </div>
+    } @else if (estado() === 'error') {
+      <div class="state-card" role="alert">
+        <span class="state-icon state-icon-error" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2.2"/><path d="M24 15v11m0 7h.02" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </span>
+        <h2>No pudimos cargar tus citas</h2>
+        <p>Revisa tu conexión e inténtalo nuevamente.</p>
+        <button class="btn btn-outline-primary" type="button" (click)="reintentar()">Reintentar</button>
+      </div>
+    } @else if (citas().length === 0) {
+      <div class="state-card empty-card">
+        <span class="state-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="8" y="10" width="32" height="30" rx="6" stroke="currentColor" stroke-width="2.2"/><path d="M15 7v7m18-7v7M8 19h32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M17 28h14m-14 6h9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </span>
+        <h2>Todavía no tienes citas registradas</h2>
+        <p>Cuando reserves un turno, encontrarás aquí sus detalles.</p>
+        <a class="btn btn-primary" routerLink="/reservar">Crear una reserva</a>
+      </div>
+    } @else {
+      <nav class="appointment-filters" aria-label="Filtrar citas por estado">
+        <button
+          class="filter-button"
+          [class.active]="filtro() === 'todas'"
+          type="button"
+          [attr.aria-pressed]="filtro() === 'todas'"
+          (click)="seleccionarFiltro('todas')"
+        >Todas <span>{{ citas().length }}</span></button>
+        <button
+          class="filter-button"
+          [class.active]="filtro() === 'activa'"
+          type="button"
+          [attr.aria-pressed]="filtro() === 'activa'"
+          (click)="seleccionarFiltro('activa')"
+        >Activas <span>{{ totalActivas() }}</span></button>
+        <button
+          class="filter-button"
+          [class.active]="filtro() === 'cancelada'"
+          type="button"
+          [attr.aria-pressed]="filtro() === 'cancelada'"
+          (click)="seleccionarFiltro('cancelada')"
+        >Canceladas <span>{{ totalCanceladas() }}</span></button>
+      </nav>
+
+      @if (citasFiltradas().length === 0) {
+        <div class="filtered-empty" role="status">
+          <span class="filtered-empty-dot" aria-hidden="true"></span>
+          <p>{{ mensajeFiltroVacio() }}</p>
+        </div>
+      } @else {
+        <div class="appointments-list">
+          @for (cita of citasFiltradas(); track cita.id) {
+            <article class="appointment-card">
+              <header class="appointment-card-header">
+                <div class="appointment-service">
+                  <span class="service-icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" fill="none"><circle cx="8" cy="9" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="23" r="3" stroke="currentColor" stroke-width="1.8"/><path d="m10.5 10.5 13 11m-13 0 13-11m0 0 4-4m-4 4 5 1m-5 10 4 4m-4-4 5-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  <div>
+                    <span class="service-label">SERVICIO</span>
+                    <h2>{{ cita.servicio?.nombre ?? 'Servicio no disponible' }}</h2>
+                  </div>
+                </div>
+                <span
+                  class="status-badge"
+                  [class.status-active]="cita.estado === 'activa'"
+                  [class.status-cancelled]="cita.estado === 'cancelada'"
+                >{{ cita.estado === 'activa' ? 'Activa' : 'Cancelada' }}</span>
+              </header>
+
+              <dl class="appointment-details">
+                <div class="appointment-detail">
+                  <dt>Fecha</dt>
+                  <dd>{{ formatearFecha(cita.fecha) }}</dd>
+                </div>
+                <div class="appointment-detail">
+                  <dt>Hora</dt>
+                  <dd>{{ formatearHora(cita.hora) }}</dd>
+                </div>
+                <div class="appointment-detail appointment-price">
+                  <dt>Precio reservado</dt>
+                  <dd>{{ formatearPrecio(cita.precioReservado) }}</dd>
+                </div>
+              </dl>
+
+              @if (cita.notas?.trim()) {
+                <div class="appointment-notes">
+                  <span>Notas</span>
+                  <p>{{ cita.notas }}</p>
+                </div>
+              }
+
+              @if (cita.estado === 'activa') {
+                <div class="appointment-actions">
+                  <button
+                    class="btn btn-outline-danger cancel-button"
+                    type="button"
+                    [disabled]="cancelandoId() !== null || requiereActualizar()"
+                    [attr.aria-expanded]="confirmacionId() === cita.id"
+                    [attr.aria-controls]="'confirmacion-cancelacion-' + cita.id"
+                    (click)="abrirConfirmacion(cita)"
+                  >Cancelar reserva</button>
+                  @if (confirmacionId() === cita.id) {
+                    <section
+                      class="cancel-confirmation"
+                      [id]="'confirmacion-cancelacion-' + cita.id"
+                      role="group"
+                      aria-label="Confirmar cancelación de reserva"
+                    >
+                      <h3>¿Deseas cancelar esta reserva?</h3>
+                      <p>
+                        {{ cita.servicio?.nombre ?? 'Servicio no disponible' }} ·
+                        {{ formatearFecha(cita.fecha) }} · {{ formatearHora(cita.hora) }}
+                      </p>
+                      <div class="confirmation-actions">
+                        <button
+                          class="btn btn-light keep-button"
+                          type="button"
+                          [disabled]="cancelandoId() === cita.id"
+                          (click)="conservarReserva()"
+                        >Conservar reserva</button>
+                        <button
+                          class="btn btn-danger confirm-cancel-button"
+                          type="button"
+                          [disabled]="cancelandoId() !== null || requiereActualizar()"
+                          (click)="confirmarCancelacion(cita.id)"
+                        >
+                          @if (cancelandoId() === cita.id) {
+                            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                            Cancelando...
+                          } @else {
+                            Confirmar cancelación
+                          }
+                        </button>
+                      </div>
+                    </section>
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

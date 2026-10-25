@@ -1,15 +1,97 @@
 <section class="auth-page" aria-labelledby="page-title">
   <div class="container auth-container">
-    <div class="auth-card">
-      <span class="auth-icon" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none"><path d="M16 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm-9 10a9 9 0 0 1 18 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </span>
-      <span class="auth-kicker">TU CUENTA</span>
-      <h1 id="page-title">Iniciar sesión</h1>
-      <p>El acceso a tu cuenta estará disponible en la siguiente etapa de TurnoFácil.</p>
-      <div class="notice-panel"><span aria-hidden="true">i</span> Aún no hay formularios ni sesiones activas en esta versión.</div>
-      <a class="btn btn-primary w-100" routerLink="/registro">Crear una cuenta</a>
-      <a class="back-link" routerLink="/">Volver al inicio</a>
-    </div>
+    @if (inicioExitoso()) {
+      <div class="auth-card login-card success-card" role="status" aria-live="polite">
+        <span class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="m8 16 5.3 5.3L24 10.7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.8"/></svg>
+        </span>
+        <span class="auth-kicker">SESIÓN INICIADA</span>
+        <h1 id="page-title">¡Hola!</h1>
+        <p>Inicio de sesión exitoso. Redirigiendo...</p>
+      </div>
+    } @else {
+      <div class="auth-card login-card">
+        <div class="login-intro">
+          <span class="auth-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M16 16a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm-9 10a9 9 0 0 1 18 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="auth-kicker">TU CUENTA</span>
+          <h1 id="page-title">Iniciar sesión</h1>
+          <p>Ingresa tus datos para continuar con TurnoFácil.</p>
+        </div>
+
+        @if (mensajeError(); as mensaje) {
+          <div class="alert alert-danger login-error" role="alert">{{ mensaje }}</div>
+        }
+
+        <form [formGroup]="formulario" (ngSubmit)="enviarLogin()" (input)="limpiarMensajeError()" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="correo">Correo electrónico</label>
+            <input
+              class="form-control"
+              [class.is-invalid]="campoInvalido('correo')"
+              [attr.aria-invalid]="campoInvalido('correo') ? 'true' : null"
+              [attr.aria-describedby]="campoInvalido('correo') ? 'correo-error' : null"
+              id="correo"
+              type="email"
+              formControlName="correo"
+              placeholder="nombre@ejemplo.com"
+              autocomplete="email"
+              maxlength="254"
+            />
+            @if (campoInvalido('correo')) {
+              <div class="invalid-feedback d-block" id="correo-error" role="alert">
+                @if (formulario.controls.correo.hasError('required')) {
+                  Escribe tu correo electrónico.
+                } @else {
+                  Ingresa un correo electrónico válido.
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="password">Contraseña</label>
+            <div class="input-group">
+              <input
+                class="form-control"
+                [class.is-invalid]="campoInvalido('password')"
+                [attr.aria-invalid]="campoInvalido('password') ? 'true' : null"
+                [attr.aria-describedby]="campoInvalido('password') ? 'password-error' : null"
+                id="password"
+                [type]="mostrarPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Escribe tu contraseña"
+                autocomplete="current-password"
+              />
+              <button
+                class="btn btn-outline-secondary password-toggle"
+                type="button"
+                [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                [attr.aria-pressed]="mostrarPassword()"
+                (click)="mostrarPassword.update((mostrar) => !mostrar)"
+              >
+                {{ mostrarPassword() ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            @if (campoInvalido('password')) {
+              <div class="invalid-feedback d-block" id="password-error" role="alert">Escribe tu contraseña.</div>
+            }
+          </div>
+
+          <button class="btn btn-primary w-100 submit-button" type="submit" [disabled]="enviando()">
+            @if (enviando()) {
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+              Iniciando sesión...
+            } @else {
+              Iniciar sesión
+            }
+          </button>
+        </form>
+
+        <p class="register-prompt">¿Aún no tienes cuenta? <a routerLink="/registro">Crear una cuenta</a></p>
+        <a class="back-link" routerLink="/">Volver al inicio</a>
+      </div>
+    }
   </div>
 </section>

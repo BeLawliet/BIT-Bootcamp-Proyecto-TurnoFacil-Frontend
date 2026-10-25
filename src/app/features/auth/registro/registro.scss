@@ -1,1 +1,144 @@
 @use '../auth-page';
+
+.register-card {
+  width: min(100%, 560px);
+  text-align: left;
+}
+
+.register-intro {
+  margin-bottom: 1.6rem;
+  text-align: center;
+}
+
+.register-intro .auth-icon {
+  margin-bottom: 1rem;
+}
+
+.register-intro h1 {
+  margin-top: 0.45rem;
+}
+
+.register-intro p {
+  margin: 0 auto;
+  color: #627188;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.register-card .form-label {
+  margin-bottom: 0.4rem;
+  color: #263852;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.optional-label {
+  color: #627188;
+  font-size: 0.82rem;
+  font-weight: 450;
+}
+
+.register-card .form-control {
+  min-height: 2.9rem;
+  border-color: #d8e0eb;
+  color: #253651;
+  font-size: 0.92rem;
+}
+
+.register-card .form-control::placeholder {
+  color: #627188;
+}
+
+.register-card .form-control:focus {
+  border-color: #81a8f2;
+  box-shadow: 0 0 0 0.2rem rgb(40 100 215 / 13%);
+}
+
+.register-card .form-control.is-invalid,
+.register-card .form-control.is-invalid:focus {
+  border-color: #c64747;
+}
+
+.register-card .input-group .form-control.is-invalid {
+  z-index: 1;
+}
+
+.password-toggle {
+  min-width: 5.1rem;
+  border-color: #d8e0eb;
+  color: #52647f;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.password-toggle:hover {
+  border-color: #c4cfdf;
+  background: #f5f7fa;
+  color: #263852;
+}
+
+.register-card .form-text {
+  margin-top: 0.4rem;
+  color: #627188;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+.register-card .invalid-feedback {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.registration-error {
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+}
+
+.submit-button {
+  min-height: 3rem;
+  font-weight: 650;
+}
+
+.login-prompt {
+  margin: 1.25rem 0 0;
+  color: #66758c;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.login-prompt a {
+  color: #245ecb;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
+}
+
+.register-card > .back-link {
+  display: block;
+  margin-top: 0.8rem;
+  text-align: center;
+}
+
+.success-card {
+  text-align: center;
+}
+
+.success-icon {
+  display: grid;
+  width: 3.6rem;
+  height: 3.6rem;
+  place-items: center;
+  margin: 0 auto 1.2rem;
+  border-radius: 1rem;
+  background: #eaf8f2;
+  color: #28835a;
+}
+
+.success-icon svg {
+  width: 1.9rem;
+  height: 1.9rem;
+}
