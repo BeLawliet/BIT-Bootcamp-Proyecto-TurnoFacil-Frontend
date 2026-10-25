@@ -36,3 +36,8 @@ export interface Cita extends DatosCita {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CancelarReservaResponse {
+  id: string;
+  estado: 'cancelada';
+}

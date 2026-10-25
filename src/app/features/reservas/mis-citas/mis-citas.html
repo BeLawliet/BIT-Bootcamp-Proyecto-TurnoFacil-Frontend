@@ -12,6 +12,34 @@
       </a>
     </header>
 
+    @if (avisoCancelacion(); as aviso) {
+      <div
+        class="cancellation-notice"
+        [class.notice-success]="aviso.tipo === 'exito'"
+        [class.notice-error]="aviso.tipo === 'error'"
+        [class.notice-info]="aviso.tipo === 'info'"
+        [attr.role]="aviso.tipo === 'error' ? 'alert' : 'status'"
+        aria-live="polite"
+      >
+        <p>{{ aviso.mensaje }}</p>
+        @if (requiereActualizar()) {
+          <button
+            class="text-button"
+            type="button"
+            [disabled]="estado() === 'cargando' || cancelandoId() !== null"
+            (click)="actualizarAntesDeReintentar()"
+          >
+            @if (estado() === 'cargando') {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+              Actualizando...
+            } @else {
+              Actualizar citas
+            }
+          </button>
+        }
+      </div>
+    }
+
     @if (estado() === 'cargando') {
       <div class="state-card" role="status" aria-live="polite">
         <span class="spinner-border text-primary" aria-hidden="true"></span>
@@ -105,6 +133,54 @@
                 <div class="appointment-notes">
                   <span>Notas</span>
                   <p>{{ cita.notas }}</p>
+                </div>
+              }
+
+              @if (cita.estado === 'activa') {
+                <div class="appointment-actions">
+                  <button
+                    class="btn btn-outline-danger cancel-button"
+                    type="button"
+                    [disabled]="cancelandoId() !== null || requiereActualizar()"
+                    [attr.aria-expanded]="confirmacionId() === cita.id"
+                    [attr.aria-controls]="'confirmacion-cancelacion-' + cita.id"
+                    (click)="abrirConfirmacion(cita)"
+                  >Cancelar reserva</button>
+                  @if (confirmacionId() === cita.id) {
+                    <section
+                      class="cancel-confirmation"
+                      [id]="'confirmacion-cancelacion-' + cita.id"
+                      role="group"
+                      aria-label="Confirmar cancelación de reserva"
+                    >
+                      <h3>¿Deseas cancelar esta reserva?</h3>
+                      <p>
+                        {{ cita.servicio?.nombre ?? 'Servicio no disponible' }} ·
+                        {{ formatearFecha(cita.fecha) }} · {{ formatearHora(cita.hora) }}
+                      </p>
+                      <div class="confirmation-actions">
+                        <button
+                          class="btn btn-light keep-button"
+                          type="button"
+                          [disabled]="cancelandoId() === cita.id"
+                          (click)="conservarReserva()"
+                        >Conservar reserva</button>
+                        <button
+                          class="btn btn-danger confirm-cancel-button"
+                          type="button"
+                          [disabled]="cancelandoId() !== null || requiereActualizar()"
+                          (click)="confirmarCancelacion(cita.id)"
+                        >
+                          @if (cancelandoId() === cita.id) {
+                            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                            Cancelando...
+                          } @else {
+                            Confirmar cancelación
+                          }
+                        </button>
+                      </div>
+                    </section>
+                  }
                 </div>
               }
             </article>

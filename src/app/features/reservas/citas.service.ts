@@ -3,7 +3,13 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../core/models/api-response.model';
-import { Cita, CrearReservaRequest, Disponibilidad, ReservaCreada } from './cita.model';
+import {
+  CancelarReservaResponse,
+  Cita,
+  CrearReservaRequest,
+  Disponibilidad,
+  ReservaCreada,
+} from './cita.model';
 
 @Injectable({ providedIn: 'root' })
 export class CitasService {
@@ -25,5 +31,12 @@ export class CitasService {
     return this.http
       .get<ApiResponse<Cita[]>>(this.urlCitas)
       .pipe(map((respuesta) => respuesta.data));
+  }
+
+  cancelarReserva(id: string): Observable<ApiResponse<CancelarReservaResponse>> {
+    return this.http.patch<ApiResponse<CancelarReservaResponse>>(
+      `${this.urlCitas}/${encodeURIComponent(id)}/cancelar`,
+      undefined,
+    );
   }
 }
