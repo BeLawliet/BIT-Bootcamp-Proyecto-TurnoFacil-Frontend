@@ -11,15 +11,28 @@ export interface CrearReservaRequest {
   notas?: string;
 }
 
-export interface ReservaCreada {
+export type EstadoCita = 'activa' | 'cancelada';
+
+export interface ServicioCita {
   id: string;
-  servicio: {
-    id: string;
-    nombre: string;
-  };
+  nombre: string;
+}
+
+interface DatosCita {
+  id: string;
   fecha: string;
   hora: string;
-  estado: string;
+  estado: EstadoCita;
   precioReservado: number;
-  notas?: string;
+  notas?: string | null;
+}
+
+export interface ReservaCreada extends DatosCita {
+  servicio: ServicioCita;
+}
+
+export interface Cita extends DatosCita {
+  servicio: ServicioCita | null;
+  createdAt: string;
+  updatedAt: string;
 }
