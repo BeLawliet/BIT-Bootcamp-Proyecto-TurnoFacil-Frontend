@@ -30,12 +30,26 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/servicios" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Servicios</a>
           </li>
-          <li class="nav-item nav-auth">
-            <a class="nav-link" routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Iniciar sesión</a>
-          </li>
-          <li class="nav-item nav-cta">
-            <a class="btn btn-primary" routerLink="/registro" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Registrarse</a>
-          </li>
+          @if (authService.comprobacionInicialTerminada()) {
+            @if (authService.estaAutenticado()) {
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/reservar" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Reservar</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/mis-citas" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Mis citas</a>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link logout-button" type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+              </li>
+            } @else {
+              <li class="nav-item nav-auth">
+                <a class="nav-link" routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Iniciar sesión</a>
+              </li>
+              <li class="nav-item nav-cta">
+                <a class="btn btn-primary" routerLink="/registro" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Registrarse</a>
+              </li>
+            }
+          }
         </ul>
       </div>
     </div>
