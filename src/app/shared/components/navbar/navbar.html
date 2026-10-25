@@ -1,0 +1,43 @@
+<header class="site-header">
+  <nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
+    <div class="container nav-container">
+      <a class="navbar-brand brand-mark" routerLink="/" (click)="closeMenu()" aria-label="TurnoFácil, inicio">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <rect x="3" y="3" width="26" height="26" rx="9" fill="currentColor" />
+            <path d="M10 11h12M16 11v11m0 0-4-4m4 4 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span>Turno<span class="brand-light">Fácil</span></span>
+      </a>
+
+      <button
+        class="navbar-toggler menu-toggle"
+        type="button"
+        aria-controls="menuPrincipal"
+        [attr.aria-expanded]="menuOpen()"
+        [attr.aria-label]="menuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'"
+        (click)="toggleMenu()"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="menuPrincipal" class="collapse navbar-collapse" [class.show]="menuOpen()">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page" (click)="closeMenu()">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/servicios" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Servicios</a>
+          </li>
+          <li class="nav-item nav-auth">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Iniciar sesión</a>
+          </li>
+          <li class="nav-item nav-cta">
+            <a class="btn btn-primary" routerLink="/registro" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Registrarse</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

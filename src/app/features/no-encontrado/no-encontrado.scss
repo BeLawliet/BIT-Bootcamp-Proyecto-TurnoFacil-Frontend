@@ -1,0 +1,28 @@
+.not-found {
+  display: grid;
+  min-height: 64vh;
+  place-items: center;
+  background: #f7f9fd;
+  padding: 4rem 0;
+}
+
+.error-code {
+  color: #2864d7;
+  font-size: clamp(5rem, 16vw, 9rem);
+  font-weight: 800;
+  letter-spacing: -0.09em;
+  line-height: 1;
+}
+
+.not-found h1 {
+  margin: 1rem 0 0.65rem;
+  color: #172744;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 740;
+  letter-spacing: -0.055em;
+}
+
+.not-found p {
+  margin-bottom: 1.5rem;
+  color: #687891;
+}

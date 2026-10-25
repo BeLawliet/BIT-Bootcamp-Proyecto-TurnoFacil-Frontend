@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.site-header {
+  position: sticky;
+  z-index: 1000;
+  top: 0;
+  border-bottom: 1px solid #e8edf5;
+  background: rgb(255 255 255 / 96%);
+  backdrop-filter: blur(12px);
+}
+
+.nav-container {
+  min-height: 76px;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #162746;
+  font-size: 1.25rem;
+  font-weight: 750;
+  letter-spacing: -0.045em;
+}
+
+.brand-mark:hover {
+  color: #162746;
+}
+
+.brand-light {
+  color: #2864d7;
+}
+
+.brand-icon,
+.brand-icon svg {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+}
+
+.brand-icon {
+  color: #2864d7;
+}
+
+.nav-link {
+  padding: 0.7rem 0.9rem !important;
+  color: #596780;
+  font-size: 0.94rem;
+  font-weight: 550;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #245ecb;
+}
+
+.nav-cta {
+  margin-left: 0.55rem;
+}
+
+.nav-cta .btn {
+  padding: 0.65rem 1.1rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.menu-toggle {
+  border-color: #dce4f0;
+}
+
+.menu-toggle:focus-visible,
+.nav-link:focus-visible,
+.brand-mark:focus-visible,
+.nav-cta .btn:focus-visible {
+  outline: 3px solid #8bb2ff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 991.98px) {
+  .nav-container {
+    min-height: 68px;
+  }
+
+  .navbar-collapse {
+    padding: 0.5rem 0 1rem;
+  }
+
+  .nav-auth,
+  .nav-cta {
+    margin-left: 0;
+  }
+
+  .nav-cta .btn {
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+}
