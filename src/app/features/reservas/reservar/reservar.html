@@ -1,0 +1,200 @@
+<section class="reservation-page" aria-labelledby="page-title">
+  <div class="container">
+    <header class="page-heading">
+      <span class="page-eyebrow">TURNOFÁCIL · RESERVAS</span>
+      <h1 id="page-title">Reserva tu próximo turno</h1>
+      <p>Elige un servicio, una fecha y uno de los horarios disponibles de la barbería.</p>
+    </header>
+
+    @if (reservaCreada(); as reserva) {
+      <article class="success-card" role="status" aria-live="polite">
+        <span class="success-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="m8 16 5.3 5.3L24 10.7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.8"/></svg>
+        </span>
+        <span class="page-eyebrow">RESERVA CONFIRMADA</span>
+        <h2>¡Tu turno está reservado!</h2>
+        <p class="success-copy">La reserva fue confirmada correctamente.</p>
+        <dl class="success-details">
+          <div><dt>Servicio</dt><dd>{{ reserva.servicio.nombre }}</dd></div>
+          <div><dt>Fecha</dt><dd>{{ reserva.fecha }}</dd></div>
+          <div><dt>Hora</dt><dd>{{ reserva.hora }}</dd></div>
+          <div><dt>Precio confirmado</dt><dd>{{ formatearPrecio(reserva.precioReservado) }}</dd></div>
+          @if (reserva.notas) {
+            <div><dt>Notas</dt><dd>{{ reserva.notas }}</dd></div>
+          }
+        </dl>
+        <a class="btn btn-primary" routerLink="/mis-citas">Ir a mis citas</a>
+      </article>
+    } @else {
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-8">
+          <form class="booking-card" [formGroup]="formulario" (ngSubmit)="confirmarReserva()" novalidate>
+            <div class="card-heading">
+              <span class="step-badge">1</span>
+              <div>
+                <h2>Detalles de tu turno</h2>
+                <p>Completa los datos para consultar la agenda.</p>
+              </div>
+            </div>
+
+            @if (mensajeError(); as mensaje) {
+              <div class="alert alert-danger" role="alert">{{ mensaje }}</div>
+            }
+
+            <div class="mb-4">
+              <label class="form-label" for="servicio">Servicio</label>
+              @switch (estadoServicios().tipo) {
+                @case ('cargando') {
+                  <div class="inline-state" role="status"><span class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></span> Consultando servicios...</div>
+                }
+                @case ('error') {
+                  <div class="inline-state error-copy" role="alert">No pudimos cargar los servicios. <button class="text-button" type="button" (click)="reintentarServicios()">Reintentar</button></div>
+                }
+                @case ('vacio') {
+                  <div class="inline-state" role="status">No hay servicios disponibles por ahora.</div>
+                }
+                @case ('listo') {
+                  <select
+                    class="form-select"
+                    id="servicio"
+                    formControlName="servicioId"
+                    (change)="actualizarServicioSeleccionado()"
+                    aria-describedby="servicio-ayuda"
+                  >
+                    <option value="">Selecciona un servicio</option>
+                    @for (servicio of servicios(); track servicio.id) {
+                      <option [value]="servicio.id">{{ servicio.nombre }} · {{ formatearPrecio(servicio.precio) }}</option>
+                    }
+                  </select>
+                  <div class="form-hint" id="servicio-ayuda">El precio final se confirma con la respuesta del servidor.</div>
+                }
+              }
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label" for="fecha">Fecha</label>
+              <input
+                class="form-control"
+                [class.is-invalid]="campoFechaInvalido()"
+                id="fecha"
+                type="date"
+                [min]="fechaMinima"
+                [attr.aria-invalid]="campoFechaInvalido() ? 'true' : null"
+                [attr.aria-describedby]="campoFechaInvalido() ? 'fecha-error' : null"
+                formControlName="fecha"
+                (input)="limpiarMensajeError()"
+              />
+              @if (campoFechaInvalido()) {
+                <div class="invalid-feedback d-block" id="fecha-error" role="alert">
+                  @if (formulario.controls.fecha.hasError('required')) {
+                    Selecciona una fecha para continuar.
+                  } @else if (formulario.controls.fecha.hasError('fechaAnterior')) {
+                    Selecciona hoy o una fecha posterior en Colombia.
+                  } @else {
+                    Selecciona una fecha válida.
+                  }
+                </div>
+              }
+            </div>
+
+            <fieldset class="availability-section mb-4">
+              <legend class="form-label">Horario disponible</legend>
+              @switch (estadoDisponibilidad().tipo) {
+                @case ('esperando') {
+                  <p class="availability-message">Selecciona una fecha para consultar los horarios.</p>
+                }
+                @case ('fecha-invalida') {
+                  <p class="availability-message">Selecciona una fecha válida desde hoy para consultar horarios.</p>
+                }
+                @case ('consultando') {
+                  <div class="availability-message" role="status" aria-live="polite"><span class="spinner-border spinner-border-sm text-primary" aria-hidden="true"></span> Consultando disponibilidad...</div>
+                }
+                @case ('disponible') {
+                  <div class="time-options" role="group" aria-label="Horarios disponibles">
+                    @for (hora of horasDisponibles(); track hora) {
+                      <button
+                        class="time-option"
+                        [class.selected]="formulario.controls.hora.value === hora"
+                        type="button"
+                        [attr.aria-pressed]="formulario.controls.hora.value === hora"
+                        (click)="seleccionarHora(hora)"
+                      >{{ hora }}</button>
+                    }
+                  </div>
+                }
+                @case ('vacio') {
+                  @if (sinHorariosEsDomingo()) {
+                    <p class="availability-message">Los domingos no hay atención. Elige otra fecha.</p>
+                  } @else {
+                    <p class="availability-message">No hay horarios disponibles para esta fecha. Elige otro día.</p>
+                  }
+                }
+                @case ('error') {
+                  <div class="availability-message error-copy" role="alert">
+                    No pudimos consultar la disponibilidad.
+                    <button class="text-button" type="button" (click)="reintentarDisponibilidad()">Reintentar</button>
+                  </div>
+                }
+              }
+              @if (formulario.controls.hora.touched && formulario.controls.hora.value === '' && estadoDisponibilidad().tipo === 'disponible') {
+                <div class="form-hint error-copy" role="alert">Selecciona uno de los horarios disponibles.</div>
+              }
+            </fieldset>
+
+            <div class="mb-4">
+              <label class="form-label" for="notas">Notas <span class="optional-label">Opcional</span></label>
+              <textarea
+                class="form-control"
+                id="notas"
+                rows="3"
+                maxlength="500"
+                formControlName="notas"
+                placeholder="Cuéntanos si tienes alguna preferencia."
+                (input)="limpiarMensajeError()"
+              ></textarea>
+              <div class="form-hint text-end">{{ formulario.controls.notas.value.length }}/500 caracteres</div>
+            </div>
+
+            <button class="btn btn-primary confirm-button" type="submit" [disabled]="!puedeConfirmar()">
+              @if (enviando()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                Confirmando reserva...
+              } @else {
+                Confirmar reserva
+              }
+            </button>
+            @if (!puedeConfirmar() && !enviando()) {
+              <p class="form-hint text-center mb-0 mt-2">Completa los campos y elige un horario disponible para continuar.</p>
+            }
+          </form>
+        </div>
+
+        <aside class="col-lg-4" aria-labelledby="summary-title">
+          <section class="summary-card">
+            <span class="summary-eyebrow">RESUMEN</span>
+            <h2 id="summary-title">Tu reserva</h2>
+            <dl class="summary-list">
+              <div>
+                <dt>Servicio</dt>
+                <dd>{{ servicioSeleccionado()?.nombre ?? 'Selecciona un servicio' }}</dd>
+              </div>
+              <div>
+                <dt>Fecha</dt>
+                <dd>{{ formulario.controls.fecha.value || 'Selecciona una fecha' }}</dd>
+              </div>
+              <div>
+                <dt>Hora</dt>
+                <dd>{{ formulario.controls.hora.value || 'Selecciona un horario' }}</dd>
+              </div>
+            </dl>
+            <div class="summary-price">
+              <span>Precio del servicio</span>
+              <strong>{{ precioSeleccionado() }}</strong>
+            </div>
+            <p class="summary-note">El precio definitivo será confirmado por la barbería al crear la reserva.</p>
+          </section>
+        </aside>
+      </div>
+    }
+  </div>
+</section>

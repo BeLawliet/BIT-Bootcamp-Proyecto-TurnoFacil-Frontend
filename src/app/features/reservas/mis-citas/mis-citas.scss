@@ -1,0 +1,39 @@
+.placeholder-page {
+  display: grid;
+  min-height: 65vh;
+  place-items: center;
+  background: linear-gradient(180deg, #f6f9ff 0, #fff 72%);
+  padding: 3.5rem 0;
+}
+
+.placeholder-card {
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid #e7edf6;
+  border-radius: 1.2rem;
+  background: #fff;
+  padding: clamp(1.6rem, 5vw, 3rem);
+  text-align: center;
+  box-shadow: 0 1rem 2.5rem rgb(18 41 78 / 6%);
+}
+
+.placeholder-label {
+  color: #2864d7;
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.placeholder-card h1 {
+  margin: 0.7rem 0;
+  color: #172744;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 750;
+  letter-spacing: -0.055em;
+}
+
+.placeholder-card p {
+  margin: 0;
+  color: #687891;
+  line-height: 1.7;
+}
